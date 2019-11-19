@@ -7,17 +7,15 @@ package model;
 
 /**
  * Occurs when incorrect number is passed to model.
- * @author Michal
- * @version %I%, %G% 
- * @since
+ * @author Michal Nowak
+ * @version 2.0
+ * @since 20-10-2019
  */
 public class IncorrectNumberException extends Exception {
     /**
-     * Returns message containing cause of throwing exception.
-     * @return Exception message
+     * Calls base class constructor, passing <code>"Incorrect number, only decimal and binary allowed"</code> as argument.
      */
-    @Override
-    public String getMessage() {
-        return "Incorrect number. Only decimal and binary allowed.";
+    public IncorrectNumberException() {
+        super("Incorrect number, only positive decimal and binary allowed");
     }
 }
