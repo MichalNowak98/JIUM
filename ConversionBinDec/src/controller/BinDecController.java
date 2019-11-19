@@ -17,7 +17,7 @@ import java.util.Scanner;
  * sends passed values to model and calls methods from model to convert values
  * or from view to show results and give information to user.
  * @author Michal Nowak
- * @version 2.0
+ * @version 2.1
  * @since 20-10-2019
  */
 public class BinDecController implements Controller{
@@ -67,15 +67,15 @@ public class BinDecController implements Controller{
         view.showNumberBeforeConversion(val);
         //value have to have at least 3 characters to be binary number: 0b0 or 0b1
         if(val.length() < 3) {
-            model.setConvertedValue(model.convertDecToBin(index));
+            model.addConvertedValue(model.convertDecToBin(index));
         }
         else if(val.charAt(0) == '0' && (val.charAt(1) == 'b' || val.charAt(1) == 'B')) {
-            model.setConvertedValue(model.convertBinToDec(index));
+            model.addConvertedValue(model.convertBinToDec(index));
         }
         else {
-            model.setConvertedValue(model.convertDecToBin(index));
+            model.addConvertedValue(model.convertDecToBin(index));
         }
-        view.showNumberAfterConversion(model.getConvertedValue());
+        view.showNumberAfterConversion(model.getConvertedValue(index));
     }
     /**
      * Runs user interface in console, letting user to type desired number to be converted or path to .txt file with numbers to be converted in it. Typing 'q' results in exiting loop and function. 

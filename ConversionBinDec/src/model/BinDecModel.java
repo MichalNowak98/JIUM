@@ -12,17 +12,18 @@ import java.util.List;
  * Stores values to be converted in list. Enables to add and get value with methods, convert them
  * to decimal and binary numeral system and verifies correctness of assigned value.
  * @author Michal Nowak
- * @version 2.0 
+ * @version 2.1 
  * @since 20-10-2019
  */
 public class BinDecModel {
     /** List of String representations of values in decimal or binary numeral system. */
     private List<String> values;
     /** String representation of last converted value in decimal or binary numeral system. */
-    private String convertedValue;
+    private List<String> convertedValues;
     
     public BinDecModel() {
         values = new ArrayList();
+        convertedValues = new ArrayList();
     }
     /**
      * Clears <code>values</code> List
@@ -31,6 +32,9 @@ public class BinDecModel {
         if(!values.isEmpty()){
             values.clear();
         }
+        if(!convertedValues.isEmpty()){
+            convertedValues.clear();
+        }
     }
     public int getValuesSize() {
         return values.size();
@@ -38,11 +42,11 @@ public class BinDecModel {
     public String getValue(int index) {
         return values.get(index);
     }
-    public void setConvertedValue(String convertedValue) {
-        this.convertedValue = convertedValue;
+    public void addConvertedValue(String convertedValue) {
+        convertedValues.add(convertedValue);
     }
-    public String getConvertedValue() {
-        return convertedValue;
+    public String getConvertedValue(int index) {
+        return convertedValues.get(index);
     }
     /**
      * Verifies correctness of passed value before adding it to <code>values</code> List. If <code>value</code> is correct decimal or binary number, it is added to List. In other case, it throws an <code>IncorrectNumberException</code> exception.
