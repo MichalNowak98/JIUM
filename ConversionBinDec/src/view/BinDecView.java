@@ -5,32 +5,46 @@
  */
 package view;
 
+import java.util.List;
+import java.util.Scanner;
+
 /**
  * Contains variety of methods giving user informations about results and program options.
  * @author Michal Nowak
- * @version 2.0
+ * @version 2.2
  * @since 20-10-2019
  */
 public class BinDecView {
+    private Scanner scan;
+    
+    public BinDecView() {
+        scan = new Scanner(System.in);
+    }
     /**
-     * Prints "Enter value to be converted: " in console.
+     * Prints "Enter value to be converted: " in console and returns value passed by user.
+     * @return value passed by user
      */
-    public void askForInput() {
+    public String askForInput() {
         System.out.println("Enter value to be converted: ");
+        return scan.nextLine();
     }
     /**
-     * Prints "Enter path to text file storing values to be converted: " in console.
+     * Prints "Enter path to text file storing values to be converted: " in console and returns path to file passed by user.
+     * @return path to file passed by user.
      */
-    public void askForFilePath() {
+    public String askForFilePath() {
         System.out.println("Enter path to text file storing values to be converted: ");
+        return scan.nextLine();
     }
     /**
-     * Prints menu for user in console, showing available options.
+     * Prints menu for user in console, showing available options, and returns character passed by user.
+     * @return Character passed by user
      */
-    public void askForChoice() {
+    public char askForChoice() {
         System.out.println("1:  type number for conversion");
         System.out.println("2:  give path to text file with numbers to convert");
         System.out.println("q:  quit application");
+        return scan.nextLine().charAt(0);
     }
     /**
      * Prints value before conversion in console followed by "=" sign. Designed to be used before showNumberAfterConversion(String value).
@@ -52,5 +66,25 @@ public class BinDecView {
      */
     public void logException(String errorMsg) {
         System.out.println(errorMsg);
+    }
+    
+    public void showResults(List<String> originalValues, List<String> convertedValues)
+    {
+        int i = 0;
+        for(String value : originalValues) {
+            System.out.println(value + " = " + convertedValues.get(i++));
+        }
+    }
+    
+    public void showResults(String[] originalValues, String[] convertedValues)
+    {
+        int i = 0;
+        for(String value : originalValues) {
+            System.out.println(value + " = " + convertedValues[i++]);
+        }
+    }
+    
+    public void showConfirmationMsg(String confMsg) {
+        System.out.println("Server confirmation: " + confMsg);
     }
 }

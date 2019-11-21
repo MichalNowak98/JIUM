@@ -10,6 +10,10 @@ import view.BinDecView;
 import model.IncorrectNumberException;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.Scanner;
 
 /**
@@ -17,7 +21,7 @@ import java.util.Scanner;
  * sends passed values to model and calls methods from model to convert values
  * or from view to show results and give information to user.
  * @author Michal Nowak
- * @version 2.1
+ * @version 2.2
  * @since 20-10-2019
  */
 public class BinDecController implements Controller{
@@ -27,18 +31,34 @@ public class BinDecController implements Controller{
     private BinDecModel model;
     /** Reference to Scanner. */
     private Scanner scan;
+    /** communication socket */
+    private DatagramSocket datagramSocket;
+    /** server port number  */
+    private int PORT;
+    /** server address */
+    private InetAddress hostAddress;
+    /** buffer for input data */
+    private byte[] buf;
+    /** data frame */
+    private DatagramPacket dp;
+    /** a client id */
+    private int id;
     
     /* public methods */
     /**
      * Constructor assigning <code>view</code> and <code>model</code> to object fields.
      * @param view Reference to object representing user interface of application
-     * @param model Reference to object representing model of application
      */
-    public BinDecController(BinDecView view, BinDecModel model)
+    public BinDecController(BinDecView view, DatagramSocket datagramSocket, int PORT, InetAddress hostAddress, byte[] buf, DatagramPacket dp, int id)
     {
         this.view = view;
-        this.model = model;
         scan = new Scanner(System.in);
+        this.datagramSocket = datagramSocket;
+        this.PORT = PORT;
+        this.hostAddress = hostAddress;
+        this.buf = buf;
+        this.dp = dp;
+        this.id = id;
     }    
     /**
      * Converts passed String representations of decimal or binary values
@@ -46,17 +66,22 @@ public class BinDecController implements Controller{
      */
     @Override
     public void convert(String ... value) {
-        for (String val : value) {
-            try{
-                model.addValue(val);
-            } catch (IncorrectNumberException ex){
-                view.logException(ex.getMessage());
-            }
+        try {
+            String rcvd;
+            for (String val : value) {
+                buf = val.getBytes();
+                datagramSocket.send(new DatagramPacket(buf, buf.length, hostAddress, PORT));
+                //confirmation
+                datagramSocket.receive(dp);
+                view.showConfirmationMsg(new String(dp.getData(), 0, dp.getLength()));
+                //data
+                datagramSocket.receive(dp);
+                view.showNumberBeforeConversion(val);
+                view.showNumberAfterConversion(new String(dp.getData(), 0, dp.getLength()));
+            }                
+        } catch (IOException e) {
+            System.err.println("Error during communication!");
         }
-        for(int i = 0; i < model.getValuesSize(); i++) {
-            convertModelValue(i);
-        }
-        model.clearValues();
     }
     /**
      * Converts element at <code>index</code> to binary or decimal numeral system
@@ -64,7 +89,6 @@ public class BinDecController implements Controller{
      */
     private void convertModelValue(int index) {
         String val = model.getValue(index);
-        view.showNumberBeforeConversion(val);
         //value have to have at least 3 characters to be binary number: 0b0 or 0b1
         if(val.length() < 3) {
             model.addConvertedValue(model.convertDecToBin(index));
@@ -75,7 +99,6 @@ public class BinDecController implements Controller{
         else {
             model.addConvertedValue(model.convertDecToBin(index));
         }
-        view.showNumberAfterConversion(model.getConvertedValue(index));
     }
     /**
      * Runs user interface in console, letting user to type desired number to be converted or path to .txt file with numbers to be converted in it. Typing 'q' results in exiting loop and function. 
@@ -84,19 +107,15 @@ public class BinDecController implements Controller{
     public void runConsoleInterface () {
         boolean usedByUser = true;
         while (usedByUser) {
-            view.askForChoice();
-            char choice = scan.nextLine().charAt(0);
+            char choice = view.askForChoice();
             switch (choice) {
                 case '1': {
-                    view.askForInput();
-                    convert(scan.nextLine());
+                    convert(view.askForInput());
                     break;
                 }
                 case '2': {
-                    view.askForFilePath();
                     Scanner fileScanner;
-                    File file = new File(scan.nextLine());
-                    /* throws FileNotFoundException */
+                    File file = new File(view.askForFilePath());
                     try {
                         fileScanner = new Scanner(file);
                         while(fileScanner.hasNext()) {

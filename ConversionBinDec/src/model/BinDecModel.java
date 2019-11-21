@@ -39,6 +39,12 @@ public class BinDecModel {
     public int getValuesSize() {
         return values.size();
     }
+    public String[] getValues() {
+        return values.toArray(new String[0]);
+    }
+    public String[] getConvertedValues() {
+        return convertedValues.toArray(new String[0]);
+    }
     public String getValue(int index) {
         return values.get(index);
     }
