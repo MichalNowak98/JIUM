@@ -3,12 +3,6 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/D:/!!NetBeans/ConversionBinDec/src/controller/BinDecController.java</file>
-            <file>file:/D:/!!NetBeans/ConversionBinDec/src/view/BinDecView.java</file>
-            <file>file:/D:/!!NetBeans/ConversionBinDec/src/controller/Controller.java</file>
-            <file>file:/D:/!!NetBeans/ConversionBinDec/test/ModelJUnitTest.java</file>
-            <file>file:/D:/!!NetBeans/ConversionBinDec/src/model/BinDecModel.java</file>
-            <file>file:/D:/!!NetBeans/ConversionBinDec/src/conversionbindec/ConversionBinDec.java</file>
             <file>file:/D:/!!NetBeans/ConversionBinDec/src/server/ConversionBinDecServer.java</file>
             <file>file:/D:/!!NetBeans/ConversionBinDec/src/client/ConversionBinDecClient.java</file>
         </group>

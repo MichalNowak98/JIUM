@@ -6,6 +6,9 @@
 package client;
 
 import controller.BinDecController;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -14,6 +17,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Properties;
 import view.BinDecView;
 
 /**
@@ -24,7 +28,7 @@ public class ConversionBinDecClient extends Thread{
     /** communication socket */
     private DatagramSocket datagramSocket;
     /** server port number  */
-    static final int PORT = 1998;
+    static int PORT;
     /** server address */
     private InetAddress hostAddress;
     /** buffer for input data */
@@ -43,18 +47,37 @@ public class ConversionBinDecClient extends Thread{
         valuesToConvert.addAll(Arrays.asList(args));
     }
     
-     /** 
-     * The constructor of the UDP client object
-     * @param id client identifier
-     */
+    /** 
+    * The constructor of the UDP client object
+    * @param id client identifier
+    */
     public ConversionBinDecClient(int id) {
+        Properties properties = new Properties();
+            try (FileInputStream in = new FileInputStream(".properties")) {
+                properties.load(in);
+                PORT = Integer.parseInt(properties.getProperty("ClientPORT"));
+                String hostname = properties.getProperty("hostAdress");
+                hostAddress = InetAddress.getByName(hostname);
+            } catch (Exception e) {
+                PORT = 1998;
+                properties.setProperty("ClientPORT", new StringBuilder().append(PORT).toString());
+                properties.setProperty("hostAddress", "localhost");
+                //try{
+                    //properties.setProperty("hostAddress", InetAddress.getByName("localhost").toString());
+                //} catch (UnknownHostException ex) {
+                //    System.err.println("Unknown server!");
+                //} 
+                try (FileOutputStream out = new FileOutputStream(".properties")) {
+                    properties.store(out, "--Client configuration--");
+                } catch (IOException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
+           
         this.id = id;
         view = new BinDecView();
         try {
             datagramSocket = new DatagramSocket();
-            hostAddress = InetAddress.getByName("localhost");
-        } catch (UnknownHostException e) {
-            System.err.println("Unknown server!");
         } catch (SocketException e) {
             System.err.println("Connection is not available!");
         }

@@ -5,10 +5,13 @@
  */
 package server;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
+import java.util.Properties;
 import model.BinDecModel;
 import model.IncorrectNumberException;
 
@@ -18,7 +21,7 @@ import model.IncorrectNumberException;
  */
 public class ConversionBinDecServer {
     /** accessing port */
-    static final int PORT = 1998;
+    static int PORT;
     /** buffer for input data */
     private byte[] buf = new byte[1024];
     /** data frame */
@@ -33,6 +36,19 @@ public class ConversionBinDecServer {
      */
     public ConversionBinDecServer() {
         try {
+            Properties properties = new Properties();
+            try (FileInputStream in = new FileInputStream(".properties")) {
+                properties.load(in);
+                PORT = Integer.parseInt(properties.getProperty("ServerPORT"));           
+            } catch (Exception e) {
+                properties.setProperty("ServerPORT", "1998");
+                PORT = 1998;
+                try (FileOutputStream out = new FileOutputStream(".properties")) {
+                    properties.store(out, "--Serwver configuration--");
+                } catch (IOException ex) {
+                    System.err.println(ex.getMessage());
+                }
+            }
             socket = new DatagramSocket(PORT);
             System.out.println("Server started");
             while (true) {
