@@ -4,20 +4,12 @@
  * and open the template in the editor.
  */
 
-import controller.BinDecController;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Scanner;
 import model.BinDecModel;
 import model.IncorrectNumberException;
 import static org.hamcrest.CoreMatchers.is;
-import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import view.BinDecView;
 
 /**
  *
@@ -25,30 +17,20 @@ import view.BinDecView;
  */
 public class ModelJUnitTest {
     private BinDecModel model;
-    private BinDecView view;
-    private BinDecController con;
     private final String messageIncorrectNumberException = "Incorrect number, only positive decimal and binary allowed";
     
+    /**
+     * Empty constructor
+     */
     public ModelJUnitTest() {
     }
     
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
+    /**
+     * Creates new BinDecModel for tests
+     */
     @Before
     public void setUp() {
         model = new BinDecModel();
-        view = new BinDecView();
-        con = new BinDecController(view, model);
-    }
-    
-    @After
-    public void tearDown() {
     }
     
     /**
@@ -154,24 +136,6 @@ public class ModelJUnitTest {
             model.clearValues();
         } catch (IncorrectNumberException ex) {
             fail("Exception thrown" + ex.getMessage());
-        }
-    }
-    /**
-     * Validates converting numbers form text file
-     */
-    @Test
-    public void testFile() {
-        Scanner fileScanner;
-        File file = new File("d:/x.txt");
-        /* throws FileNotFoundException */
-        try {
-            fileScanner = new Scanner(file);
-            while(fileScanner.hasNext()) {
-                con.convert(fileScanner.next());
-            }
-        }
-        catch (FileNotFoundException ex) {
-            view.logException(ex.getMessage());
         }
     }
 }

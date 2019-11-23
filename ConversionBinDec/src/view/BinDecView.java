@@ -43,6 +43,7 @@ public class BinDecView {
     public char askForChoice() {
         System.out.println("1:  type number for conversion");
         System.out.println("2:  give path to text file with numbers to convert");
+        System.out.println("3:  HELP");
         System.out.println("q:  quit application");
         return scan.nextLine().charAt(0);
     }
@@ -86,5 +87,9 @@ public class BinDecView {
     
     public void showConfirmationMsg(String confMsg) {
         System.out.println("Server confirmation: " + confMsg);
+    }
+    
+    public void showMsg(String msg){
+        System.out.println(msg);
     }
 }

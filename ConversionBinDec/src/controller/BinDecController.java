@@ -5,15 +5,23 @@
  */
 package controller;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import model.BinDecModel;
 import view.BinDecView;
 import model.IncorrectNumberException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
 /**
@@ -31,8 +39,10 @@ public class BinDecController implements Controller{
     private BinDecModel model;
     /** Reference to Scanner. */
     private Scanner scan;
-    /** communication socket */
-    private DatagramSocket datagramSocket;
+    /** buffered input character stream. */
+    private BufferedReader input;
+    /** Formatted output character stream. */
+    private PrintWriter output;
     /** server port number  */
     private int PORT;
     /** server address */
@@ -43,22 +53,27 @@ public class BinDecController implements Controller{
     private DatagramPacket dp;
     /** a client id */
     private int id;
+    /** socket representing connection to the client. */
+    private Socket socket;
+    
+    //List<String> values = new ArrayList();
     
     /* public methods */
     /**
      * Constructor assigning <code>view</code> and <code>model</code> to object fields.
      * @param view Reference to object representing user interface of application
      */
-    public BinDecController(BinDecView view, DatagramSocket datagramSocket, int PORT, InetAddress hostAddress, byte[] buf, DatagramPacket dp, int id)
+    public BinDecController(BinDecView view, int PORT, InetAddress hostAddress, byte[] buf, DatagramPacket dp, int id, BufferedReader input, PrintWriter output)
     {
         this.view = view;
         scan = new Scanner(System.in);
-        this.datagramSocket = datagramSocket;
         this.PORT = PORT;
         this.hostAddress = hostAddress;
         this.buf = buf;
         this.dp = dp;
         this.id = id;
+        this.input = input;
+        this.output = output;
     }    
     /**
      * Converts passed String representations of decimal or binary values
@@ -67,17 +82,17 @@ public class BinDecController implements Controller{
     @Override
     public void convert(String ... value) {
         try {
-            String rcvd;
             for (String val : value) {
-                buf = val.getBytes();
-                datagramSocket.send(new DatagramPacket(buf, buf.length, hostAddress, PORT));
+                //values.add(val);
+                String msg = "SEND " + val, rcvd;
+                output.println(msg);
                 //confirmation
-                datagramSocket.receive(dp);
-                view.showConfirmationMsg(new String(dp.getData(), 0, dp.getLength()));
+                rcvd = input.readLine();
+                view.showConfirmationMsg(rcvd);
                 //data
-                datagramSocket.receive(dp);
+                rcvd = input.readLine();
                 view.showNumberBeforeConversion(val);
-                view.showNumberAfterConversion(new String(dp.getData(), 0, dp.getLength()));
+                view.showNumberAfterConversion(rcvd);
             }                
         } catch (IOException e) {
             System.err.println("Error during communication!");
@@ -124,6 +139,17 @@ public class BinDecController implements Controller{
                     }
                     catch (FileNotFoundException ex) {
                         view.logException(ex.getMessage());
+                    }
+                    break;
+                }
+                case '3': {
+                    try{
+                        String cmd = "HELP", rcvd;
+                        output.println(cmd);
+                        rcvd = input.readLine();
+                        view.showNumberAfterConversion(rcvd);
+                    } catch (IOException e) {
+                        System.err.println("Error during communication!");
                     }
                     break;
                 }
