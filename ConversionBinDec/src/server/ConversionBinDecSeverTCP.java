@@ -46,11 +46,7 @@ public class ConversionBinDecSeverTCP implements Closeable {
         serverSocket = new ServerSocket(PORT);
     }
 
-    /**
-     * The main application method
-     *
-     * @params args all parametres are ignored
-     */
+    
     public static void main(String args[]) {
 
         try (ConversionBinDecSeverTCP tcpServer = new ConversionBinDecSeverTCP()) {
@@ -129,32 +125,45 @@ class SingleService implements Closeable {
                 if (sb.substring(0, 4).toUpperCase().equals("QUIT")) {
                     break;
                 } else if (sb.substring(0, 4).toUpperCase().equals("HELP")) {
-                    msg = "SEND : SEND value[;second value[;third value[...]]], CONV : CONV, HELP : HELP";
+                    msg = "SEND : SEND value, CONV : CONV, HELP : HELP";
                     output.println(msg);
-                }
-                else if (sb.substring(0, 4).toUpperCase().equals("SEND")){
+                } else if (sb.substring(0, 4).toUpperCase().equals("SEND")){
                     sb.delete(0, 5);
                     rcvd = sb.toString();
-                    msg = "Got number " + rcvd + " to convert";
+                    msg = "Got SEND command with number " + rcvd + " to convert";
                     output.println(msg);
                     try{
                         model.addValue(rcvd);
-                        if(rcvd.length() < 3) {
-                            model.addConvertedValue(model.convertDecToBin(0));
-                        }
-                        else if(rcvd.charAt(0) == '0' && (rcvd.charAt(1) == 'b' || rcvd.charAt(1) == 'B')) {
-                            model.addConvertedValue(model.convertBinToDec(0));
-                        }
-                        else {
-                            model.addConvertedValue(model.convertDecToBin(0));
-                        }
-                        msg = model.getConvertedValue(0);
-                        model.clearValues();
-                        output.println(msg);
                     } catch (IncorrectNumberException ex){
                         output.println(ex.getMessage());
                     }
-                }                
+                } else if (sb.substring(0, 4).toUpperCase().equals("CONV")){
+                    sb.delete(0, 5);
+                    msg = "Got CONV command";
+                    output.println(msg);
+                    int numberOfElements = model.getValuesSize();
+                    sb = new StringBuffer();
+                    sb.append(numberOfElements);
+                    msg = sb.toString();
+                    output.println(msg);
+                    for (int i = 0; i < numberOfElements; i++) {
+                        if(rcvd.length() < 3) {
+                            model.addConvertedValue(model.convertDecToBin(i));
+                        }
+                        else if(rcvd.charAt(0) == '0' && (rcvd.charAt(1) == 'b' || rcvd.charAt(1) == 'B')) {
+                            model.addConvertedValue(model.convertBinToDec(i));
+                        }
+                        else {
+                            model.addConvertedValue(model.convertDecToBin(i));
+                        }
+                        msg = model.getValue(i);
+                        output.println(msg);
+                        msg = model.getConvertedValue(i);
+                        output.println(msg);
+                    }
+                    model.clearValues();
+                }
+                
             }
         } catch (IOException e) {
             System.err.println(e.getMessage());

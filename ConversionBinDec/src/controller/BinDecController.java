@@ -6,20 +6,13 @@
 package controller;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import model.BinDecModel;
 import view.BinDecView;
-import model.IncorrectNumberException;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -47,30 +40,19 @@ public class BinDecController implements Controller{
     private int PORT;
     /** server address */
     private InetAddress hostAddress;
-    /** buffer for input data */
-    private byte[] buf;
-    /** data frame */
-    private DatagramPacket dp;
     /** a client id */
     private int id;
-    /** socket representing connection to the client. */
-    private Socket socket;
     
-    //List<String> values = new ArrayList();
-    
-    /* public methods */
     /**
      * Constructor assigning <code>view</code> and <code>model</code> to object fields.
      * @param view Reference to object representing user interface of application
      */
-    public BinDecController(BinDecView view, int PORT, InetAddress hostAddress, byte[] buf, DatagramPacket dp, int id, BufferedReader input, PrintWriter output)
+    public BinDecController(BinDecView view, int PORT, InetAddress hostAddress, int id, BufferedReader input, PrintWriter output)
     {
         this.view = view;
         scan = new Scanner(System.in);
         this.PORT = PORT;
         this.hostAddress = hostAddress;
-        this.buf = buf;
-        this.dp = dp;
         this.id = id;
         this.input = input;
         this.output = output;
@@ -82,37 +64,33 @@ public class BinDecController implements Controller{
     @Override
     public void convert(String ... value) {
         try {
+            String msg, rcvd;
+            //sending values to convert
             for (String val : value) {
-                //values.add(val);
-                String msg = "SEND " + val, rcvd;
+                msg = "SEND " + val;
                 output.println(msg);
                 //confirmation
                 rcvd = input.readLine();
                 view.showConfirmationMsg(rcvd);
+            }
+            //sending command CONV to get converted values
+            msg = "CONV";
+            output.println(msg);
+            rcvd = input.readLine();
+            System.out.println(rcvd);
+            //getting number of elements converted
+            rcvd = input.readLine();
+            int numberOfElements = Integer.parseInt(rcvd);
+            //printing results from server
+            for(int i = 0; i < numberOfElements; i++) {
                 //data
                 rcvd = input.readLine();
-                view.showNumberBeforeConversion(val);
+                view.showNumberBeforeConversion(rcvd);
+                rcvd = input.readLine();
                 view.showNumberAfterConversion(rcvd);
-            }                
+            }
         } catch (IOException e) {
             System.err.println("Error during communication!");
-        }
-    }
-    /**
-     * Converts element at <code>index</code> to binary or decimal numeral system
-     * @param index Index for values list
-     */
-    private void convertModelValue(int index) {
-        String val = model.getValue(index);
-        //value have to have at least 3 characters to be binary number: 0b0 or 0b1
-        if(val.length() < 3) {
-            model.addConvertedValue(model.convertDecToBin(index));
-        }
-        else if(val.charAt(0) == '0' && (val.charAt(1) == 'b' || val.charAt(1) == 'B')) {
-            model.addConvertedValue(model.convertBinToDec(index));
-        }
-        else {
-            model.addConvertedValue(model.convertDecToBin(index));
         }
     }
     /**
@@ -129,13 +107,15 @@ public class BinDecController implements Controller{
                     break;
                 }
                 case '2': {
+                    List<String> values = new ArrayList();
                     Scanner fileScanner;
                     File file = new File(view.askForFilePath());
                     try {
                         fileScanner = new Scanner(file);
                         while(fileScanner.hasNext()) {
-                            convert(fileScanner.next());
+                            values.add(fileScanner.next());
                         }
+                        convert(values.toArray(new String[0]));
                     }
                     catch (FileNotFoundException ex) {
                         view.logException(ex.getMessage());

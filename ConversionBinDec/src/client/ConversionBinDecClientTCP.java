@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
-import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -24,43 +23,52 @@ import java.util.Properties;
 import view.BinDecView;
 
 /**
+ * Client TCP. Connects to TCP server and allows to 
  * @author Michal
  */
 public class ConversionBinDecClientTCP extends Thread{
-    /** server port number  */
-    static int PORT;
-    /** server address */
+    /** Server port number.  */
+    int PORT;
+    /** Server address. */
     private InetAddress hostAddress;
-    /** buffer for input data */
-    private byte[] buf = new byte[1024];
-    /** data frame */
-    private DatagramPacket dp = new DatagramPacket(buf, buf.length);
-    /** a client id */
+    /** Client id. */
     private int id;
-    /** buffered input character stream. */
+    /** Buffered input character stream. */
     private BufferedReader input;
     /** Formatted output character stream. */
     private PrintWriter output;
-    /** socket representing connection to the client. */
+    /** Socket of a client. */
     private Socket socket;
-    
+    /** Reference to view component. */
     private BinDecView view;
-    
+    /** Reference to controller component. */
     private BinDecController controller;
-    
+    /** Name of the host server. */
+    private String hostname;
+    /** List containing values to send to server. */
     private static List<String> valuesToConvert = new ArrayList();
     
+    /**
+     * Sets <code>valuesToConvert</code> with values to convert.
+     * @param args Values to convert.
+     */
     private static void setValuesToConvert(String ... args) {
         valuesToConvert.addAll(Arrays.asList(args));
     }
     
-    private ConversionBinDecClientTCP(int id){
-        Properties properties = new Properties();
+    /**
+     * Constructor taking id of a client. Creates view and controller instances,
+     * gets or sets <code>hostName</code> and <code>PORT</code> from 
+     * <code>.properties</code> file and sets all fields important for connection.
+     * @param id id of a client.
+     */
+    public ConversionBinDecClientTCP(int id){
         view = new BinDecView();
+        Properties properties = new Properties();
         try (FileInputStream in = new FileInputStream(".properties")) {
             properties.load(in);
             PORT = Integer.parseInt(properties.getProperty("ClientPORT"));
-            String hostname = properties.getProperty("hostAdress");
+            hostname = properties.getProperty("hostAdress");
             hostAddress = InetAddress.getByName(hostname);
         } catch (Exception e) {
             PORT = 1998;
@@ -73,9 +81,8 @@ public class ConversionBinDecClientTCP extends Thread{
                 System.err.println(ex.getMessage());
             }
         }
-        this.id = id;
         try {
-            socket = new Socket("localhost",this.PORT);
+            socket = new Socket(hostname, this.PORT);
             output = new PrintWriter(
                 new BufferedWriter(
                 new OutputStreamWriter(
@@ -86,9 +93,14 @@ public class ConversionBinDecClientTCP extends Thread{
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
-        controller = new BinDecController(view, PORT, hostAddress, buf, dp, id, input, output);
+        controller = new BinDecController(view, PORT, hostAddress, id, input, output);
+        this.id = id;
     }
     
+    /**
+     * Prints connection message from server, passes command line arguments to 
+     * server and runs console user interface.
+     */
     @Override
     public void run() {
         try {
@@ -97,16 +109,17 @@ public class ConversionBinDecClientTCP extends Thread{
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
-        //controller.convert(valuesToConvert.toArray(new String[0]));
+        controller.convert(valuesToConvert.toArray(new String[0]));
         controller.runConsoleInterface();
     }
 
     /** 
-     * The main application method 
-     * @param args Contains numbers for conversion, both decimal and binary. Order does not matter.
+     * The main application method. Creates and starts instance of client.
+     * @param args Contains numbers for conversion, both decimal and binary.
+     * Order does not matter.
      * @author Michal Nowak
-     * @version 2.0 
-     * @since 20-10-2019
+     * @version 3.0 
+     * @since 24-11-2019
      */
     public static void main(String[] args) {
         setValuesToConvert(args);

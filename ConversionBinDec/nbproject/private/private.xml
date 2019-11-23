@@ -5,8 +5,11 @@
         <group>
             <file>file:/D:/!!NetBeans/ConversionBinDec/src/controller/BinDecController.java</file>
             <file>file:/D:/!!NetBeans/ConversionBinDec/src/view/BinDecView.java</file>
-            <file>file:/D:/!!NetBeans/ConversionBinDec/src/server/ConversionBinDecServer.java</file>
-            <file>file:/D:/!!NetBeans/ConversionBinDec/src/client/ConversionBinDecClient.java</file>
+            <file>file:/D:/!!NetBeans/ConversionBinDec/src/view/package-info.java</file>
+            <file>file:/D:/!!NetBeans/ConversionBinDec/src/controller/Controller.java</file>
+            <file>file:/D:/!!NetBeans/ConversionBinDec/src/client/ConversionBinDecClientTCP.java</file>
+            <file>file:/D:/!!NetBeans/ConversionBinDec/src/model/BinDecModel.java</file>
+            <file>file:/D:/!!NetBeans/ConversionBinDec/src/server/ConversionBinDecSeverTCP.java</file>
         </group>
     </open-files>
 </project-private>
